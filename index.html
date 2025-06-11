@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Your Marks</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 2px solid #3a6073;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 0 25px rgba(0, 0, 50, 0.5);
+      color: #e0f7fa;
+      animation: slideDown 0.7s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      color: #aee1f9;
+    }
+
+    label, select, input, button {
+      width: 100%;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    select, input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #4b79a1;
+      background: #1c2a38;
+      color: #ffffff;
+    }
+
+    button {
+      background-color: #1e3c72;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #2a5298;
+      transform: scale(1.05);
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #000;
+      font-size: 16px;
+      line-height: 1.6;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      animation: fadeInResult 0.6s ease;
+    }
+
+    .creator-credit {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      transform: none;
+      background: linear-gradient(to right, #0077b6, #00b4d8);
+      color: white;
+      padding: 12px 22px;
+      font-size: 14px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 50, 0.4);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      animation: pulseGlow 2s infinite ease-in-out;
+      text-align: center;
+      z-index: 999;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInResult {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 8px #00b4d8; }
+      50% { box-shadow: 0 0 20px #00b4d8; }
+      100% { box-shadow: 0 0 8px #00b4d8; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="typing-title"></h2>
+    <label for="class">Select Your Class:</label>
+    <select id="class">
+      <option value="JE_11A">JE - 11A</option>
+      <option value="JE_11B">JE - 11B</option>
+      <option value="NEET_11A">NEET - 11A</option>
+      <option value="NEET_11B">NEET - 11B</option>
+    </select>
+    <label for="roll">Enter Your Roll Number:</label>
+    <input type="text" id="roll" placeholder="e.g. 2450">
+    <label for="phone">Enter Your Phone Number:</label>
+    <input type="text" id="phone" placeholder="e.g. 8610768371">
+    <button onclick="showMarks()">Show My Marks</button>
+    <div id="result"></div>
+    <button onclick="adminLogin()">🔒 Admin Login</button>
+    <div id="admin-panel" style="display:none;">
+      <h3>🛠️ Admin Panel</h3>
+      <input type="file" id="csvFile" accept=".csv">
+      <button onclick="loadCSV()">Upload Student CSV</button>
+      <button onclick="exportCSV()">📤 Download All Student Data</button>
+      <div id="stats"></div>
+    </div>
+  </div>
+
+  <audio id="success-sound" src="https://www.soundjay.com/buttons/sounds/button-29.mp3"></audio>
+  <div class="creator-credit">
+    👨‍💻 Designed & Developed with 💙 by <strong>G. Tarun Shankar (TS)</strong><br>
+    📚 Class 11 – JEE B Section
+  </div>
+
+  <script>
+    let marksData = [];
+
+    function showMarks() {
+      const roll = document.getElementById("roll").value.trim();
+      const studentClass = document.getElementById("class").value;
+      const phone = document.getElementById("phone").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      const student = marksData.find(
+        s => s.roll === roll && s.class === studentClass && s.phone === phone
+      );
+
+      if (student) {
+        document.getElementById("success-sound").play();
+        const total = parseInt(student.maths) + parseInt(student.science);
+        let feedback = "<p><strong>Feedback:</strong><br>";
+        if (student.maths < 60) feedback += "📌 Try to improve in Maths.<br>";
+        if (student.science > 90) feedback += "💡 Excellent in Science!<br>";
+        if (student.maths >= 90 && student.science >= 90) feedback += "🏆 Outstanding performance!";
+        feedback += "</p>";
+
+        resultDiv.innerHTML = `
+          <h3>Hello ${student.name}!</h3>
+          <p><strong>Class:</strong> ${student.class}</p>
+          <p><strong>Maths:</strong> ${student.maths}</p>
+          <p><strong>Science:</strong> ${student.science}</p>
+          <p><strong>Total:</strong> ${total}</p>
+          ${feedback}
+        `;
+      } else {
+        resultDiv.innerHTML = `<p style="color: red;">❌ No result found. Please check your roll number, class, and phone number.</p>`;
+      }
+    }
+
+    function adminLogin() {
+      const password = prompt("Enter admin password:");
+      if (password === "tarun1109") {
+        document.getElementById("admin-panel").style.display = "block";
+        alert("Admin access granted.");
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+
+    function loadCSV() {
+      const file = document.getElementById('csvFile').files[0];
+      if (file) {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            marksData = results.data;
+            alert("✅ CSV data loaded successfully!");
+            showStats();
+          },
+          error: function(err) {
+            alert("❌ Failed to read CSV file: " + err.message);
+          }
+        });
+      } else {
+        alert("❗ Please select a CSV file first.");
+      }
+    }
+
+    function exportCSV() {
+      const csv = Papa.unparse(marksData);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "student_marks_export.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function showStats() {
+      if (marksData.length === 0) return;
+      const total = marksData.length;
+      const mathsMarks = marksData.map(s => parseInt(s.maths));
+      const scienceMarks = marksData.map(s => parseInt(s.science));
+
+      const stats = `
+        <p>📊 <strong>Total Students:</strong> ${total}</p>
+        <p>📈 <strong>Maths:</strong> Avg: ${avg(mathsMarks)}, High: ${Math.max(...mathsMarks)}, Low: ${Math.min(...mathsMarks)}</p>
+        <p>🔬 <strong>Science:</strong> Avg: ${avg(scienceMarks)}, High: ${Math.max(...scienceMarks)}, Low: ${Math.min(...scienceMarks)}</p>
+      `;
+      document.getElementById("stats").innerHTML = stats;
+    }
+
+    function avg(arr) {
+      return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
+    }
+
+    let i = 0;
+    let txt = "🎓 Check Your Marks";
+    function typeWriter() {
+      if (i < txt.length) {
+        document.getElementById("typing-title").innerHTML += txt.charAt(i);
+        i++;
+        setTimeout(typeWriter, 70);
+      }
+    }
+    window.onload = typeWriter;
+  </script>
+</body>
+</html>
