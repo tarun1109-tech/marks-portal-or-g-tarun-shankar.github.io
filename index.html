@@ -1,248 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Check Your Marks</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       margin: 0;
-      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: #e0e0ff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      animation: fadeIn 1s ease-in-out;
+      overflow: hidden;
     }
-
     .container {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 2px solid #3a6073;
-      border-radius: 15px;
-      padding: 30px;
-      max-width: 500px;
+      background: rgba(30, 30, 60, 0.9);
+      border: 2px solid #5c33f6;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 0 25px rgba(91, 33, 182, 0.6);
       width: 90%;
-      box-shadow: 0 0 25px rgba(0, 0, 50, 0.5);
-      color: #e0f7fa;
-      animation: slideDown 0.7s ease-in-out;
+      max-width: 500px;
+      animation: fadeIn 1s ease;
     }
-
-    h2 {
+    h2, h3 {
       text-align: center;
-      color: #aee1f9;
+      margin: 0;
     }
-
-    label, select, input, button {
-      width: 100%;
-      margin-top: 15px;
-      font-size: 16px;
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: #9fbcff;
     }
-
-    select, input {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #4b79a1;
-      background: #1c2a38;
+    h3 {
       color: #ffffff;
+      margin-top: 10px;
     }
-
-    button {
-      background-color: #1e3c72;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
+    label {
       margin-top: 20px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
+      display: block;
+      font-size: 15px;
     }
-
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 10px;
+      background: #222c4f;
+      color: #e0f0ff;
+      font-size: 14px;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
     button:hover {
-      background-color: #2a5298;
       transform: scale(1.05);
     }
-
     #result {
-      margin-top: 20px;
+      margin-top: 30px;
       padding: 20px;
-      border-radius: 10px;
-      background: #ffffff;
-      color: #000;
-      font-size: 16px;
-      line-height: 1.6;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      animation: fadeInResult 0.6s ease;
+      background: #1f1b2e;
+      border-radius: 15px;
+      color: #cfdfff;
+      animation: fadeIn 0.6s ease-in;
     }
-
-    .creator-credit {
+    .credit {
       position: fixed;
-      bottom: 12px;
-      right: 12px;
-      transform: none;
-      background: linear-gradient(to right, #0077b6, #00b4d8);
-      color: white;
-      padding: 12px 22px;
-      font-size: 14px;
-      border-radius: 30px;
-      box-shadow: 0 4px 12px rgba(0, 0, 50, 0.4);
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      animation: pulseGlow 2s infinite ease-in-out;
-      text-align: center;
-      z-index: 999;
+      bottom: 10px;
+      right: 10px;
+      font-size: 12px;
+      color: #a0a0ff;
+      background: rgba(50, 50, 70, 0.7);
+      padding: 8px 16px;
+      border-radius: 20px;
     }
-
+    #copy-msg {
+      text-align: center;
+      margin-top: 10px;
+      color: #5df2d6;
+      font-size: 14px;
+    }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeInResult {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes pulseGlow {
-      0% { box-shadow: 0 0 8px #00b4d8; }
-      50% { box-shadow: 0 0 20px #00b4d8; }
-      100% { box-shadow: 0 0 8px #00b4d8; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2 id="typing-title"></h2>
+    <h2>🏫 Narayana Junior College, PNM</h2>
+    <h3 id="typing-title"></h3>
     <label for="class">Select Your Class:</label>
     <select id="class">
-      <option value="JE_11A">JE - 11A</option>
-      <option value="JE_11B">JE - 11B</option>
-      <option value="NEET_11A">NEET - 11A</option>
-      <option value="NEET_11B">NEET - 11B</option>
+      <option value="JEE_11">JEE - 11</option>
+      <option value="NEET_11">NEET - 11</option>
+      <option value="JEE_12">JEE - 12</option>
+      <option value="NEET_12">NEET - 12</option>
     </select>
     <label for="roll">Enter Your Roll Number:</label>
     <input type="text" id="roll" placeholder="e.g. 2450">
-    <label for="phone">Enter Your Phone Number:</label>
-    <input type="text" id="phone" placeholder="e.g. 8610768371">
-    <button onclick="showMarks()">Show My Marks</button>
+    <button onclick="showMarks()">🎯 Show My Marks</button>
     <div id="result"></div>
-    <button onclick="adminLogin()">🔒 Admin Login</button>
-    <div id="admin-panel" style="display:none;">
-      <h3>🛠️ Admin Panel</h3>
-      <input type="file" id="csvFile" accept=".csv">
-      <button onclick="loadCSV()">Upload Student CSV</button>
-      <button onclick="exportCSV()">📤 Download All Student Data</button>
-      <div id="stats"></div>
-    </div>
+    <button onclick="copyLink()">🔗 Copy Website Link</button>
+    <p id="copy-msg"></p>
   </div>
-
-  <audio id="success-sound" src="https://www.soundjay.com/buttons/sounds/button-29.mp3"></audio>
-  <div class="creator-credit">
-    👨‍💻 Designed & Developed with 💙 by <strong>G. Tarun Shankar (TS)</strong><br>
-    📚 Class 11 – JEE B Section
+  <div class="credit">
+    Developed by <strong><a href='https://www.instagram.com/tarun_shankar_glv' target='_blank' style='color: #a0c4ff; text-decoration: none;'>G. Tarun Shankar (TS)</a></strong> | Class 11 – JEE B Section
   </div>
-
+  <audio id="successSound" src="https://www.fesliyanstudios.com/play-mp3/6678" preload="auto"></audio>
+  <audio id="failSound" src="https://www.fesliyanstudios.com/play-mp3/6989" preload="auto"></audio>
   <script>
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRBaL6adPlXFy7hEFaTFnyhhqZUXU7WNNf7QR_7ngpdiPho_z2MKQZSnf6z1siJ_XYoWXok3yj2V9IW/pub?output=csv";
     let marksData = [];
+
+    Papa.parse(sheetUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        marksData = results.data;
+      }
+    });
 
     function showMarks() {
       const roll = document.getElementById("roll").value.trim();
       const studentClass = document.getElementById("class").value;
-      const phone = document.getElementById("phone").value.trim();
       const resultDiv = document.getElementById("result");
+      const successSound = document.getElementById("successSound");
+      const failSound = document.getElementById("failSound");
 
-      const student = marksData.find(
-        s => s.roll === roll && s.class === studentClass && s.phone === phone
-      );
+      const student = marksData.find(s => s.roll === roll && s.class === studentClass);
 
       if (student) {
-        document.getElementById("success-sound").play();
-        const total = parseInt(student.maths) + parseInt(student.science);
-        let feedback = "<p><strong>Feedback:</strong><br>";
-        if (student.maths < 60) feedback += "📌 Try to improve in Maths.<br>";
-        if (student.science > 90) feedback += "💡 Excellent in Science!<br>";
-        if (student.maths >= 90 && student.science >= 90) feedback += "🏆 Outstanding performance!";
-        feedback += "</p>";
-
-        resultDiv.innerHTML = `
-          <h3>Hello ${student.name}!</h3>
-          <p><strong>Class:</strong> ${student.class}</p>
-          <p><strong>Maths:</strong> ${student.maths}</p>
-          <p><strong>Science:</strong> ${student.science}</p>
-          <p><strong>Total:</strong> ${total}</p>
-          ${feedback}
-        `;
+        successSound.play();
+        let html = `<h3>Hello ${student.name}!</h3><p><strong>Class:</strong> ${student.class}</p>`;
+        if (student.maths) html += `<p><strong>Maths:</strong> ${student.maths}</p>`;
+        if (student.physics) html += `<p><strong>Physics:</strong> ${student.physics}</p>`;
+        if (student.chemistry) html += `<p><strong>Chemistry:</strong> ${student.chemistry}</p>`;
+        if (student.class.includes("NEET")) {
+          html += `<p><strong>Biology:</strong> ${student.bio}</p>`;
+        } else {
+          html += `<p><strong>Biology:</strong> #</p>`;
+        }
+        if (student.english) html += `<p><strong>English:</strong> ${student.english}</p>`;
+        if (student.computer) html += `<p><strong>Computer Science:</strong> ${student.computer}</p>`;
+        if (student.physics) html += `<p><strong>Physics:</strong> ${student.physics}</p>`;
+        if (student.chemistry) html += `<p><strong>Chemistry:</strong> ${student.chemistry}</p>`;
+        if (student.class.includes("NEET") && student.bio) html += `<p><strong>Biology:</strong> ${student.bio}</p>`;
+        resultDiv.innerHTML = html;
       } else {
-        resultDiv.innerHTML = `<p style="color: red;">❌ No result found. Please check your roll number, class, and phone number.</p>`;
+        failSound.play();
+        resultDiv.innerHTML = `<p style='color: red;'>❌ No result found. Please check your roll number and class.</p>`;
       }
     }
 
-    function adminLogin() {
-      const password = prompt("Enter admin password:");
-      if (password === "tarun1109") {
-        document.getElementById("admin-panel").style.display = "block";
-        alert("Admin access granted.");
-      } else {
-        alert("Incorrect password.");
-      }
-    }
-
-    function loadCSV() {
-      const file = document.getElementById('csvFile').files[0];
-      if (file) {
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          complete: function(results) {
-            marksData = results.data;
-            alert("✅ CSV data loaded successfully!");
-            showStats();
-          },
-          error: function(err) {
-            alert("❌ Failed to read CSV file: " + err.message);
-          }
-        });
-      } else {
-        alert("❗ Please select a CSV file first.");
-      }
-    }
-
-    function exportCSV() {
-      const csv = Papa.unparse(marksData);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "student_marks_export.csv";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function showStats() {
-      if (marksData.length === 0) return;
-      const total = marksData.length;
-      const mathsMarks = marksData.map(s => parseInt(s.maths));
-      const scienceMarks = marksData.map(s => parseInt(s.science));
-
-      const stats = `
-        <p>📊 <strong>Total Students:</strong> ${total}</p>
-        <p>📈 <strong>Maths:</strong> Avg: ${avg(mathsMarks)}, High: ${Math.max(...mathsMarks)}, Low: ${Math.min(...mathsMarks)}</p>
-        <p>🔬 <strong>Science:</strong> Avg: ${avg(scienceMarks)}, High: ${Math.max(...scienceMarks)}, Low: ${Math.min(...scienceMarks)}</p>
-      `;
-      document.getElementById("stats").innerHTML = stats;
-    }
-
-    function avg(arr) {
-      return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
+    function copyLink() {
+      const link = window.location.href;
+      navigator.clipboard.writeText(link).then(() => {
+        document.getElementById("copy-msg").innerText = "✅ Link copied to clipboard!";
+        setTimeout(() => {
+          document.getElementById("copy-msg").innerText = "";
+        }, 3000);
+      });
     }
 
     let i = 0;
@@ -251,7 +185,7 @@
       if (i < txt.length) {
         document.getElementById("typing-title").innerHTML += txt.charAt(i);
         i++;
-        setTimeout(typeWriter, 70);
+        setTimeout(typeWriter, 60);
       }
     }
     window.onload = typeWriter;
